@@ -1,72 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>One Moment</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      background: #0b1020;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    h1 { font-size: 36px; }
-    button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background: #4da3ff;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      cursor: pointer;
-    }
-    .count { font-size: 22px; margin-top: 20px; }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="container">
+    <h1 class="title">🌍 One Moment</h1>
+    <p class="subtitle">The world pauses together.</p>
 
-<h1>🌍 One Moment</h1>
-<p>The world pauses together.</p>
+    <div class="timer">
+      Next Moment in <br />
+      <span id="countdown">881m 22s</span>
+    </div>
 
-<h2 id="timer">Loading...</h2>
+    <div class="question">
+      ❓ What are you grateful for right now?
+    </div>
 
-<p><strong>Question:</strong><br>
-What are you grateful for right now?</p>
+    <button class="btn">I'm Here</button>
 
-<button onclick="join()">I'm Here</button>
-
-<div class="count">
-People joined today: <span id="count">0</span>
-</div>
-
-<script>
-  let count = 0;
-
-  function join() {
-    count++;
-    document.getElementById("count").innerText = count;
-    alert("You joined the moment 🌍");
-  }
-
-  function updateTimer() {
-    const now = new Date();
-    const target = new Date();
-    target.setUTCHours(12,0,0,0); // 12:00 UTC
-
-    if (now > target) target.setUTCDate(target.getUTCDate() + 1);
-
-    const diff = target - now;
-    const mins = Math.floor(diff / 60000);
-    const secs = Math.floor((diff % 60000) / 1000);
-
-    document.getElementById("timer").innerText =
-      `Next Moment in ${mins}m ${secs}s`;
-  }
-
-  setInterval(updateTimer, 1000);
-  updateTimer();
-</script>
-
+    <div class="count">
+      👥 People joined today: <span>2</span>
+    </div>
+  </div>
 </body>
 </html>
