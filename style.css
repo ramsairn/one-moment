@@ -1,85 +1,63 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", sans-serif;
-}
-
-body {
-  min-height: 100vh;
-  margin: 0;
-  background: linear-gradient(
-    180deg,
-    #0f172a 0%,
-    #1f2937 40%,
-    #374151 70%,
-    #111827 100%
-  );
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-.container {
-  text-align: center;
-  padding: 30px 20px;
-  max-width: 360px;
+/* Starry background */
+.stars {
+  position: fixed;
   width: 100%;
+  height: 100%;
+  background: transparent;
+  overflow: hidden;
+  z-index: -1;
 }
 
-.title {
-  font-size: 2.2rem;
-  margin-bottom: 10px;
+.stars::before, .stars::after {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(white, transparent) repeat;
+  background-size: 3px 3px;
+  animation: drift 60s linear infinite;
 }
 
-.subtitle {
-  font-size: 1rem;
-  opacity: 0.85;
-  margin-bottom: 30px;
+.stars::after {
+  background-size: 2px 2px;
+  opacity: 0.6;
+  animation-duration: 120s;
 }
 
-.timer {
-  background: rgba(255,255,255,0.08);
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 20px;
-  font-size: 1rem;
+@keyframes drift {
+  from { transform: translate(0,0); }
+  to { transform: translate(-50px,-100px); }
 }
 
-.timer span {
-  font-size: 1.6rem;
-  font-weight: bold;
-  color: #7dd3fc;
+/* Breathing circle */
+.breathing-circle {
+  width: 80px;
+  height: 80px;
+  margin: 20px auto;
+  border-radius: 50%;
+  background: #7dd3fc;
+  animation: breathe 6s ease-in-out infinite;
 }
 
-.question {
-  margin: 20px 0;
-  font-size: 1.1rem;
-  color: #e0f2fe;
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.5); opacity: 1; }
 }
 
-.btn {
-  margin: 25px 0;
-  padding: 14px 28px;
-  font-size: 1.1rem;
-  border: none;
-  border-radius: 30px;
-  background: linear-gradient(90deg, #22c55e, #4ade80);
-  color: #022c22;
-  cursor: pointer;
-  box-shadow: 0 0 20px rgba(34,197,94,0.6);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Gratitude floating message */
+.gratitude-msg {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(125, 211, 252, 0.2);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  animation: floatUp 4s ease forwards;
 }
 
-.btn:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(34,197,94,0.9);
-}
-
-.count {
-  margin-top: 10px;
-  font-size: 0.95rem;
-  opacity: 0.85;
+@keyframes floatUp {
+  0% { bottom: 20px; opacity: 1; }
+  100% { bottom: 200px; opacity: 0; }
 }
