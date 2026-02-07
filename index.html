@@ -5,12 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>One Moment</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;600&family=Noto+Sans+SC:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --accent: #7dd3fc;
+      --accent-dim: rgba(125, 211, 252, 0.2);
+      --green: #22c55e;
+      --green-glow: rgba(34, 197, 94, 0.6);
+    }
     body {
       background: linear-gradient(270deg, #0f172a, #1f2937, #374151, #111827);
       background-size: 600% 600%;
       animation: gradientShift 30s ease infinite;
-      font-family: 'Poppins', sans-serif;
+      font-family: 'Poppins', 'Noto Sans Arabic', 'Noto Sans SC', 'Noto Sans Devanagari', sans-serif;
       color: #fff;
       margin: 0;
       min-height: 100vh;
@@ -18,6 +25,10 @@
       align-items: center;
       justify-content: center;
       text-align: center;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      body, .particle, .timer.urgent, .breathing-circle, .gratitude-msg { animation: none !important; }
+      .particle { opacity: 0.2; }
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -36,11 +47,20 @@
       border-radius: 12px;
       padding: 15px;
       margin-bottom: 20px;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+    }
+    .timer.urgent {
+      box-shadow: 0 0 24px var(--accent-dim);
+      animation: timerPulse 1s ease-in-out infinite;
+    }
+    @keyframes timerPulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
     }
     .timer span {
       font-size: 1.6rem;
       font-weight: bold;
-      color: #7dd3fc;
+      color: var(--accent);
     }
     .question { margin: 20px 0; color: #e0f2fe; }
     input {
@@ -50,113 +70,506 @@
       margin-top: 10px;
       width: 80%;
       text-align: center;
+      font-family: inherit;
+      background: rgba(255,255,255,0.95);
+      color: #111827;
     }
+    input::placeholder { color: #6b7280; }
     .btn {
       margin: 20px 0;
       padding: 12px 24px;
       border: none;
       border-radius: 30px;
-      background: linear-gradient(90deg, #22c55e, #4ade80);
+      background: linear-gradient(90deg, var(--green), #4ade80);
       color: #022c22;
       font-size: 1rem;
+      font-family: inherit;
+      font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 0 20px rgba(34,197,94,0.6);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 20px var(--green-glow);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
     }
-    .btn:hover {
+    .btn:hover:not(:disabled) {
       transform: scale(1.05);
       box-shadow: 0 0 30px rgba(34,197,94,0.9);
     }
+    .btn:disabled {
+      cursor: default;
+      opacity: 0.9;
+    }
     .count { font-size: 0.9rem; opacity: 0.85; }
+    .gratitude-list {
+      margin-top: 24px;
+      text-align: left;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .gratitude-list h3 {
+      font-size: 0.85rem;
+      opacity: 0.8;
+      margin-bottom: 8px;
+      font-weight: 400;
+    }
+    .gratitude-item {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      margin: 4px 0;
+      background: var(--accent-dim);
+      border-radius: 8px;
+      color: #e0f2fe;
+      animation: fadeIn 0.4s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
     .modal {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.85);
       display: flex;
       align-items: center;
       justify-content: center;
+      z-index: 100;
+      animation: fadeIn 0.3s ease;
     }
     .modal.hidden { display: none; }
     .modal-content {
       background: #1f2937;
       padding: 30px;
-      border-radius: 12px;
+      border-radius: 16px;
       text-align: center;
-      box-shadow: 0 0 30px rgba(255,255,255,0.2);
+      box-shadow: 0 0 40px rgba(125, 211, 252, 0.2);
+      max-width: 320px;
+      width: 90%;
     }
+    .modal-content h2 { margin-top: 0; }
     .breathing-circle {
       width: 80px;
       height: 80px;
       margin: 20px auto;
       border-radius: 50%;
-      background: #7dd3fc;
+      background: var(--accent);
       animation: breathe 6s ease-in-out infinite;
     }
     @keyframes breathe {
       0%, 100% { transform: scale(1); opacity: 0.6; }
       50% { transform: scale(1.5); opacity: 1; }
     }
+    .modal-close {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 24px;
+      background: transparent;
+      color: #fff;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .modal-close:hover {
+      background: rgba(255,255,255,0.1);
+    }
     .gratitude-msg {
       position: fixed;
       bottom: 20px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(125, 211, 252, 0.2);
+      background: var(--accent-dim);
       color: #fff;
       padding: 10px 20px;
       border-radius: 20px;
       animation: floatUp 4s ease forwards;
+      z-index: 50;
+      pointer-events: none;
     }
     @keyframes floatUp {
       0% { bottom: 20px; opacity: 1; }
       100% { bottom: 200px; opacity: 0; }
     }
+    .quote-box {
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      border-left: 3px solid var(--accent);
+      font-size: 0.9rem;
+      font-style: italic;
+      color: #cbd5e1;
+      text-align: left;
+    }
+    .quote-box .quote-label { font-size: 0.75rem; opacity: 0.7; margin-bottom: 4px; font-style: normal; }
+    .next-at { font-size: 0.8rem; opacity: 0.75; margin-top: 6px; }
+    .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+    .particle { position: absolute; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; opacity: 0.25; animation: float 20s ease-in-out infinite; }
+    @keyframes float {
+      0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.2; }
+      25% { transform: translate(10px, -30px) scale(1.2); opacity: 0.35; }
+      50% { transform: translate(-15px, -60px) scale(0.9); opacity: 0.25; }
+      75% { transform: translate(20px, -40px) scale(1.1); opacity: 0.3; }
+    }
+    .container { position: relative; z-index: 1; }
+    .streak { font-size: 0.85rem; opacity: 0.8; margin-top: 8px; }
+    .streak span { color: var(--accent); font-weight: 600; }
+    .toolbar { display: flex; justify-content: center; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+    .icon-btn {
+      padding: 8px 14px;
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.06);
+      color: #e0f2fe;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.4); }
+    .icon-btn.active { border-color: var(--accent); color: var(--accent); }
+    .breathing-text {
+      min-height: 24px; margin: 12px 0; font-size: 1rem; color: var(--accent);
+      transition: opacity 0.5s ease;
+    }
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4); z-index: 60;
+      animation: toastIn 0.3s ease;
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    .toast.hide { animation: toastOut 0.3s ease forwards; }
+    @keyframes toastOut {
+      from { opacity: 1; }
+      to { opacity: 0; transform: translateX(-50%) translateY(-10px); }
+    }
+    .lang-wrap { position: absolute; top: 12px; right: 12px; z-index: 10; }
+    .lang-wrap[dir="rtl"] { right: auto; left: 12px; }
+    .lang-select {
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.3);
+      color: #e0f2fe;
+      font-size: 0.85rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .next-at-local { font-size: 0.8rem; opacity: 0.9; margin-top: 4px; }
   </style>
 </head>
 <body>
+  <div class="particles" id="particles" aria-hidden="true"></div>
   <div class="container">
-    <h1 class="title">🌍 One Moment</h1>
-    <p class="subtitle">The world pauses together.</p>
-
-    <div class="timer">
-      Next Moment in <br />
-      <span id="countdown">--m --s</span>
+    <div class="lang-wrap" id="langWrap">
+      <label for="langSelect" class="sr-only">Language</label>
+      <select id="langSelect" class="lang-select" aria-label="Choose language">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="ar">العربية</option>
+        <option value="zh">中文</option>
+        <option value="hi">हिन्दी</option>
+        <option value="pt">Português</option>
+        <option value="ja">日本語</option>
+      </select>
     </div>
 
-    <div class="question">❓ What are you grateful for right now?</div>
-    <input type="text" id="gratitudeInput" placeholder="Type here..." />
+    <h1 class="title" id="i18nTitle">🌍 One Moment</h1>
+    <p class="subtitle" id="i18nSubtitle">The world pauses together.</p>
+
+    <div class="quote-box">
+      <div class="quote-label" id="i18nQuoteLabel">✨ Quote of the moment</div>
+      <div id="quoteText">—</div>
+    </div>
+
+    <div class="timer" id="timerBox">
+      <span id="i18nNextIn">Next Moment in</span> <br />
+      <span id="countdown">--m --s</span>
+      <div class="next-at" id="nextAt">—</div>
+      <div class="next-at-local" id="nextAtLocal"></div>
+    </div>
+
+    <div class="question" id="i18nQuestion">❓ What are you grateful for right now?</div>
+    <input type="text" id="gratitudeInput" placeholder="Type here... (Enter to join)" autocomplete="off" />
     <button class="btn" id="joinBtn">I'm Here</button>
 
-    <div class="count">👥 People joined today: <span id="peopleCount">2</span></div>
+    <div class="count">👥 <span id="peoplePrefix">People joined today</span>: <span id="peopleCount">0</span></div>
+    <div class="streak">🔥 <span id="streakPrefix">Your moments</span>: <span id="streakCount">0</span></div>
+
+    <div class="toolbar">
+      <button type="button" class="icon-btn" id="soundBtn">🔔 <span id="soundLabel">On</span></button>
+      <button type="button" class="icon-btn" id="shareBtn">📤 <span id="shareLabel">Share</span></button>
+    </div>
+
+    <div class="gratitude-list" id="gratitudeList">
+      <h3 id="i18nRecent">💖 Recent gratitudes</h3>
+      <div id="gratitudeItems"></div>
+    </div>
   </div>
 
-  <div id="modal" class="modal hidden">
+  <div id="modal" class="modal hidden" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
     <div class="modal-content">
-      <h2>🌍 The Moment Has Arrived</h2>
-      <p>Take a deep breath. We pause together.</p>
-      <div class="breathing-circle"></div>
+      <h2 id="modalTitle">🌍 The Moment Has Arrived</h2>
+      <p id="i18nModalPause">Follow the circle. We pause together.</p>
+      <div class="breathing-text" id="breathingText">Breathe in</div>
+      <div class="breathing-circle" aria-hidden="true"></div>
+      <button class="modal-close" id="modalClose">Continue</button>
     </div>
   </div>
 
   <script>
+    const STORAGE_KEY_PEOPLE = "one-moment-people";
+    const STORAGE_KEY_DATE = "one-moment-date";
+    const STORAGE_KEY_JOINED = "one-moment-joined";
+    const STORAGE_KEY_GRATITUDES = "one-moment-gratitudes";
+    const STORAGE_KEY_STREAK = "one-moment-streak";
+    const STORAGE_KEY_SOUND = "one-moment-sound";
+    const MAX_GRATITUDES = 10;
+
+    const QUOTES = [
+      "The present moment is the only moment available to us.",
+      "Wherever you are, be all there.",
+      "Peace is the result of retraining your mind.",
+      "In the midst of movement and chaos, keep stillness inside.",
+      "The little things? The little moments? They aren’t little.",
+      "Mindfulness is a way of befriending ourselves and our experience.",
+      "Every breath is a chance to begin again.",
+      "You are exactly where you need to be.",
+      "One moment of gratitude can change your entire day.",
+      "Pause. Breathe. You are alive.",
+      "The world is full of magic; we only need to pause to see it.",
+      "This moment is a gift—that’s why it’s called the present.",
+    ];
+
+    function getTodayKey() {
+      const d = new Date();
+      return d.getUTCFullYear() + "-" + (d.getUTCMonth() + 1) + "-" + d.getUTCDate();
+    }
+
     function getNextMoment() {
       const now = new Date();
-      now.setUTCMinutes(now.getUTCMinutes() + 60 - now.getUTCMinutes(), 0, 0);
-      return now;
+      const next = new Date(now);
+      next.setUTCMinutes(next.getUTCMinutes() + (60 - next.getUTCMinutes()), 0, 0);
+      return next;
+    }
+
+    function loadPeopleCount() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY_PEOPLE);
+        const date = localStorage.getItem(STORAGE_KEY_DATE);
+        const today = getTodayKey();
+        if (saved !== null && date === today) {
+          return parseInt(saved, 10);
+        }
+      } catch (e) {}
+      return 0;
+    }
+
+    function savePeopleCount(n) {
+      try {
+        localStorage.setItem(STORAGE_KEY_PEOPLE, String(n));
+        localStorage.setItem(STORAGE_KEY_DATE, getTodayKey());
+      } catch (e) {}
+    }
+
+    function hasJoinedToday() {
+      try {
+        const joined = localStorage.getItem(STORAGE_KEY_JOINED);
+        const date = localStorage.getItem(STORAGE_KEY_DATE);
+        const today = getTodayKey();
+        return joined === "1" && date === today;
+      } catch (e) {}
+      return false;
+    }
+
+    function setJoinedToday() {
+      try {
+        localStorage.setItem(STORAGE_KEY_JOINED, "1");
+        localStorage.setItem(STORAGE_KEY_DATE, getTodayKey());
+      } catch (e) {}
+    }
+
+    function loadGratitudes() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY_GRATITUDES);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return [];
+    }
+
+    function saveGratitude(text) {
+      const list = loadGratitudes();
+      list.unshift({ text, at: Date.now() });
+      const trimmed = list.slice(0, MAX_GRATITUDES);
+      try {
+        localStorage.setItem(STORAGE_KEY_GRATITUDES, JSON.stringify(trimmed));
+      } catch (e) {}
+      renderGratitudeList();
+    }
+
+    function renderGratitudeList() {
+      const list = loadGratitudes();
+      const el = document.getElementById("gratitudeItems");
+      el.innerHTML = list.length === 0
+        ? '<span style="opacity:0.6;font-size:0.85rem;">None yet — share one above!</span>'
+        : list.map((g) => `<div class="gratitude-item">💖 ${escapeHtml(g.text)}</div>`).join("");
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function getQuote() {
+      const hour = new Date().getUTCHours();
+      return QUOTES[hour % QUOTES.length];
+    }
+
+    function formatNextAt(date) {
+      const h = date.getUTCHours();
+      const m = date.getUTCMinutes();
+      return "at " + String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + " UTC";
+    }
+
+    function createParticles() {
+      const box = document.getElementById("particles");
+      for (let i = 0; i < 15; i++) {
+        const p = document.createElement("div");
+        p.className = "particle";
+        p.style.left = Math.random() * 100 + "%";
+        p.style.top = Math.random() * 100 + "%";
+        p.style.animationDelay = Math.random() * 10 + "s";
+        p.style.animationDuration = (15 + Math.random() * 10) + "s";
+        box.appendChild(p);
+      }
+    }
+
+    function loadStreak() {
+      try {
+        const n = localStorage.getItem(STORAGE_KEY_STREAK);
+        return n ? parseInt(n, 10) : 0;
+      } catch (e) { return 0; }
+    }
+
+    function saveStreak(n) {
+      try { localStorage.setItem(STORAGE_KEY_STREAK, String(n)); } catch (e) {}
+    }
+
+    function soundEnabled() {
+      try {
+        const v = localStorage.getItem(STORAGE_KEY_SOUND);
+        return v === null || v === "1";
+      } catch (e) { return true; }
+    }
+
+    function setSoundEnabled(on) {
+      try { localStorage.setItem(STORAGE_KEY_SOUND, on ? "1" : "0"); } catch (e) {}
+    }
+
+    function playChime() {
+      if (!soundEnabled()) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+        osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15);
+        osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.15, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start(ctx.currentTime);
+        osc.stop(ctx.currentTime + 0.5);
+      } catch (e) {}
+    }
+
+    function showToast(text, duration) {
+      const existing = document.querySelector(".toast");
+      if (existing) existing.remove();
+      const el = document.createElement("div");
+      el.className = "toast";
+      el.textContent = text;
+      document.body.appendChild(el);
+      setTimeout(() => {
+        el.classList.add("hide");
+        setTimeout(() => el.remove(), 350);
+      }, duration || 3000);
     }
 
     let targetTime = getNextMoment();
+    let timerInterval = null;
     const countdownEl = document.getElementById("countdown");
+    const timerBox = document.getElementById("timerBox");
+    const modal = document.getElementById("modal");
+    const joinBtn = document.getElementById("joinBtn");
+    const peopleCountEl = document.getElementById("peopleCount");
+    const gratitudeInput = document.getElementById("gratitudeInput");
+
+    peopleCountEl.textContent = loadPeopleCount();
+    document.getElementById("streakCount").textContent = loadStreak();
+    document.getElementById("quoteText").textContent = getQuote();
+    document.getElementById("nextAt").textContent = formatNextAt(targetTime);
+    if (hasJoinedToday()) {
+      joinBtn.textContent = "✔ Joined";
+      joinBtn.disabled = true;
+    }
+    renderGratitudeList();
+    createParticles();
+
+    const soundBtn = document.getElementById("soundBtn");
+    const soundLabel = document.getElementById("soundLabel");
+    function updateSoundUI() {
+      const on = soundEnabled();
+      soundLabel.textContent = on ? "On" : "Off";
+      soundBtn.classList.toggle("active", on);
+    }
+    updateSoundUI();
+    soundBtn.addEventListener("click", () => {
+      setSoundEnabled(!soundEnabled());
+      updateSoundUI();
+    });
+
+    document.getElementById("shareBtn").addEventListener("click", () => {
+      const t = getNextMoment();
+      const msg = "Join me at the next moment — " + formatNextAt(t) + " 🌍 One Moment";
+      navigator.clipboard.writeText(msg).then(() => showToast("Copied to clipboard!", 2000)).catch(() => showToast("Could not copy", 2000));
+    });
+
+    let oneMinuteToastShown = false;
 
     function updateCountdown() {
       const now = new Date();
-      const diff = Math.floor((targetTime - now) / 1000);
+      let diff = Math.floor((targetTime - now) / 1000);
 
       if (diff <= 0) {
-        document.getElementById("modal").classList.remove("hidden");
-        clearInterval(timer);
+        playChime();
+        modal.classList.remove("hidden");
+        document.getElementById("modalClose").focus();
+        startBreathingGuide();
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = null;
+        timerBox.classList.remove("urgent");
+        oneMinuteToastShown = false;
+        targetTime = getNextMoment();
+        document.getElementById("nextAt").textContent = formatNextAt(targetTime);
+        document.getElementById("quoteText").textContent = getQuote();
         return;
+      }
+
+      if (diff <= 60) {
+        timerBox.classList.add("urgent");
+        if (!oneMinuteToastShown) {
+          oneMinuteToastShown = true;
+          showToast("⏱ Almost there... less than a minute.", 4000);
+        }
+      } else {
+        timerBox.classList.remove("urgent");
       }
 
       const minutes = Math.floor(diff / 60);
@@ -164,25 +577,69 @@
       countdownEl.textContent = `${minutes}m ${seconds}s`;
     }
 
-    const timer = setInterval(updateCountdown, 1000);
+    let breathingPhase = 0;
+    function startBreathingGuide() {
+      const el = document.getElementById("breathingText");
+      const phases = ["Breathe in", "Hold", "Breathe out"];
+      breathingPhase = 0;
+      el.textContent = phases[0];
+      const breathInterval = setInterval(() => {
+        if (!modal.classList.contains("hidden")) {
+          breathingPhase = (breathingPhase + 1) % 3;
+          el.textContent = phases[breathingPhase];
+        } else {
+          clearInterval(breathInterval);
+        }
+      }, 2000);
+    }
 
-    const joinBtn = document.getElementById("joinBtn");
-    const peopleCountEl = document.getElementById("peopleCount");
-    const gratitudeInput = document.getElementById("gratitudeInput");
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      updateCountdown();
+      timerInterval = setInterval(updateCountdown, 1000);
+    }
 
-    joinBtn.addEventListener("click", () => {
-      let currentCount = parseInt(peopleCountEl.textContent, 10);
-      peopleCountEl.textContent = currentCount + 1;
+    startTimer();
+
+    document.getElementById("modalClose").addEventListener("click", () => {
+      modal.classList.add("hidden");
+      startTimer();
+    });
+
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.add("hidden");
+        startTimer();
+      }
+    });
+
+    function doJoin() {
+      if (joinBtn.disabled) return;
+      const currentCount = parseInt(peopleCountEl.textContent, 10) || 0;
+      const newCount = currentCount + 1;
+      peopleCountEl.textContent = newCount;
+      savePeopleCount(newCount);
+      const streak = loadStreak() + 1;
+      saveStreak(streak);
+      document.getElementById("streakCount").textContent = streak;
       joinBtn.textContent = "✔ Joined";
       joinBtn.disabled = true;
+      setJoinedToday();
 
-      if (gratitudeInput.value.trim() !== "") {
+      const text = gratitudeInput.value.trim();
+      if (text !== "") {
+        saveGratitude(text);
         const msg = document.createElement("div");
         msg.className = "gratitude-msg";
-        msg.textContent = "💖 " + gratitudeInput.value;
+        msg.textContent = "💖 " + text;
         document.body.appendChild(msg);
         setTimeout(() => msg.remove(), 4000);
       }
+    }
+
+    joinBtn.addEventListener("click", doJoin);
+    gratitudeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") doJoin();
     });
   </script>
 </body>
