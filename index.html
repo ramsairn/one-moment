@@ -1,30 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>One Moment</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <div class="container">
-    <h1 class="title">🌍 One Moment</h1>
-    <p class="subtitle">The world pauses together.</p>
+<div class="stars"></div>
 
-    <div class="timer">
-      Next Moment in <br />
-      <span id="countdown">881m 22s</span>
-    </div>
+<div class="container">
+  <h1 class="title">🌍 One Moment</h1>
+  <p class="subtitle">The world pauses together.</p>
 
-    <div class="question">
-      ❓ What are you grateful for right now?
-    </div>
-
-    <button class="btn">I'm Here</button>
-
-    <div class="count">
-      👥 People joined today: <span>2</span>
-    </div>
+  <div class="timer">
+    Next Moment in <br />
+    <span id="countdown">--m --s</span>
   </div>
-</body>
-</html>
+
+  <div class="question">
+    ❓ What are you grateful for right now?
+  </div>
+
+  <input type="text" id="gratitudeInput" placeholder="Type here..." />
+  <button class="btn" id="joinBtn">I'm Here</button>
+
+  <div class="count">
+    👥 People joined today: <span id="peopleCount">2</span>
+  </div>
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-content">
+    <h2>🌍 The Moment Has Arrived</h2>
+    <p>Take a deep breath. We pause together.</p>
+    <div class="breathing-circle"></div>
+  </div>
+</div>
