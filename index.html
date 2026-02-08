@@ -56,24 +56,6 @@
       color: #94a3b8;
     }
 
-    .btn-support {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      background: #ffdd00;
-      color: #000;
-      padding: 12px 28px;
-      border-radius: 100px;
-      text-decoration: none;
-      font-weight: 700;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn-support:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(255, 221, 0, 0.3);
-    }
-
     .footer {
       position: absolute;
       bottom: 1rem;
@@ -181,10 +163,6 @@
     <div class="prompt-box">
       🌟 Reflection: <span id="promptText"></span>
     </div>
-
-    <a href="https://www.buymeacoffee.com/YOUR_USER" class="btn-support" target="_blank">
-      ☕ Support Development
-    </a>
   </div>
 
   <div class="footer">
@@ -261,3 +239,19 @@
       "What made you smile today?",
       "Who are you grateful for?",
       "What small joy did you notice?",
+      "What do you want to let go of?"
+    ];
+    document.getElementById("promptText").innerText =
+      prompts[Math.floor(Math.random() * prompts.length)];
+
+    // Starry Background
+    for (let i = 0; i < 100; i++) {
+      const star = document.createElement("div");
+      star.className = "star";
+      star.style.top = Math.random() * 100 + "%";
+      star.style.left = Math.random() * 100 + "%";
+      document.getElementById("starryBg").appendChild(star);
+    }
+  </script>
+</body>
+</html>
