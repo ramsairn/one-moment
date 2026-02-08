@@ -5,9 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>One Moment — The World Pauses Together</title>
   <meta name="description" content="A global experiment in mindfulness. Join the world in a moment of reflection.">
-  <meta property="og:title" content="One Moment — Global Pause">
-  <meta property="og:description" content="What are you grateful for? Join the global reflection.">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80">
 
   <style>
     :root {
@@ -31,12 +28,14 @@
       text-align: center;
       padding: 2.5rem;
       width: 90%;
-      max-width: 480px;
+      max-width: 500px;
       background: var(--glass);
       backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 32px;
       box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      position: relative;
+      z-index: 1;
     }
 
     h1 { font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
@@ -52,7 +51,7 @@
     }
 
     .status-box {
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
       font-size: 1.1rem;
       color: #94a3b8;
     }
@@ -77,26 +76,32 @@
 
     .footer {
       position: absolute;
-      bottom: 2rem;
+      bottom: 1rem;
       font-size: 0.8rem;
       opacity: 0.5;
+      z-index: 1;
     }
 
-    /* Ambient Animation */
-    .bg-glow {
+    /* Starry Background */
+    .starry-bg {
+      position: fixed;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at center, #0f172a 0%, #000 100%);
+      overflow: hidden;
+      z-index: -2;
+    }
+
+    .star {
       position: absolute;
-      width: 300px; height: 300px;
-      background: var(--secondary);
-      filter: blur(150px);
+      width: 2px; height: 2px;
+      background: white;
       border-radius: 50%;
-      z-index: -1;
-      opacity: 0.2;
-      animation: move 10s infinite alternate;
+      animation: twinkle 3s infinite alternate;
     }
 
-    @keyframes move {
-      from { transform: translate(-50%, -50%); }
-      to { transform: translate(50%, 50%); }
+    @keyframes twinkle {
+      from { opacity: 0.3; transform: scale(1); }
+      to { opacity: 1; transform: scale(1.5); }
     }
 
     /* Breathing Guide */
@@ -104,7 +109,7 @@
       width: 120px; height: 120px;
       border-radius: 50%;
       background: var(--secondary);
-      margin: 2rem auto;
+      margin: 1.5rem auto;
       display: none;
       animation: breathe 8s infinite;
     }
@@ -117,7 +122,7 @@
 
     /* Gratitude Wall */
     .gratitude-wall {
-      margin-top: 2rem;
+      margin-top: 1.5rem;
       font-size: 1rem;
       color: #cbd5e1;
       opacity: 0.9;
@@ -129,11 +134,26 @@
       color: var(--primary);
       transition: opacity 1s;
     }
+
+    /* Streak Tracker */
+    .streak-box {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: #facc15;
+      font-weight: bold;
+    }
+
+    /* Reflection Prompt */
+    .prompt-box {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      color: #38bdf8;
+    }
   </style>
 </head>
 <body>
 
-  <div class="bg-glow"></div>
+  <div class="starry-bg" id="starryBg"></div>
 
   <div class="container">
     <h1>Next Global Moment</h1>
@@ -152,6 +172,16 @@
       <div id="gratitude-feed"></div>
     </div>
 
+    <!-- Streak Tracker -->
+    <div class="streak-box">
+      🔥 Streak: <span id="streakCount">0</span> days
+    </div>
+
+    <!-- Reflection Prompt -->
+    <div class="prompt-box">
+      🌟 Reflection: <span id="promptText"></span>
+    </div>
+
     <a href="https://www.buymeacoffee.com/YOUR_USER" class="btn-support" target="_blank">
       ☕ Support Development
     </a>
@@ -162,6 +192,7 @@
   </div>
 
   <script>
+    // Timer + Breathing Guide
     function updateGlobalTimer() {
       const now = new Date();
       const utcMinutes = now.getUTCMinutes();
@@ -188,7 +219,6 @@
         breathCircle.style.display = "none";
       }
     }
-
     setInterval(updateGlobalTimer, 1000);
     updateGlobalTimer();
 
@@ -200,7 +230,6 @@
       "Cherishing kindness from strangers 🤝",
       "Grateful for this shared moment 🌍"
     ];
-
     function rotateMessages() {
       const feed = document.getElementById('gratitude-feed');
       feed.style.opacity = 0;
@@ -211,6 +240,24 @@
     }
     setInterval(rotateMessages, 5000);
     rotateMessages();
-  </script>
-</body>
-</html>
+
+    // Streak Tracker
+    function updateStreak() {
+      const today = new Date().toDateString();
+      let lastPause = localStorage.getItem("lastPause");
+      let streak = parseInt(localStorage.getItem("streak") || "0");
+
+      if (lastPause !== today) {
+        streak++;
+        localStorage.setItem("streak", streak);
+        localStorage.setItem("lastPause", today);
+      }
+      document.getElementById("streakCount").innerText = streak;
+    }
+    updateStreak();
+
+    // Reflection Prompt
+    const prompts = [
+      "What made you smile today?",
+      "Who are you grateful for?",
+      "What small joy did you notice?",
