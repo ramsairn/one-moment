@@ -2,6 +2,12 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow: hidden;
+  height: 100%;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   overflow: hidden;
@@ -9,15 +15,29 @@ body {
   font-family: 'Trebuchet MS', sans-serif;
   color: white;
   text-align: center;
-  min-height: 100vh;
+  min-height: 100%;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
   cursor: default;
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  position: fixed;
+  inset: 0;
 }
 
 body.playing {
-  cursor: none; /* hide cursor during gameplay so the green circle is your control */
+  cursor: none;
+}
+
+body.collect-flash {
+  animation: collectFlash 0.15s ease-out;
+}
+@keyframes collectFlash {
+  0% { filter: brightness(1.4); }
+  100% { filter: brightness(1); }
 }
 
 /* Start Screen */
@@ -45,7 +65,8 @@ body.playing {
 
 #startBtn {
   margin-top: 20px;
-  padding: 12px 25px;
+  padding: 14px 28px;
+  min-height: 48px;
   font-size: 20px;
   background: linear-gradient(to right, #00ffcc, #0099ff);
   color: black;
@@ -54,6 +75,7 @@ body.playing {
   cursor: pointer;
   box-shadow: 0 0 15px #00ffcc;
   transition: transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #startBtn:hover {
@@ -72,20 +94,128 @@ body.playing {
 
 #score, #lives, #highScore {
   position: fixed;
-  top: 10px;
+  top: max(10px, env(safe-area-inset-top));
   padding: 8px 15px;
   border: 2px solid #00ffcc;
   border-radius: 8px;
   background: rgba(0,0,0,0.5);
-  font-size: 20px;
+  font-size: clamp(16px, 4vw, 20px);
   font-weight: bold;
   z-index: 10;
   box-shadow: 0 0 10px #00ffcc;
 }
 
-#score { left: 10px; }
-#lives { right: 10px; }
+#score { left: max(10px, env(safe-area-inset-left)); }
+#lives { right: max(10px, env(safe-area-inset-right)); }
 #highScore { left: 50%; transform: translateX(-50%); }
+
+#comboDisplay {
+  position: fixed;
+  left: 50%;
+  top: 55px;
+  transform: translateX(-50%);
+  font-size: 18px;
+  color: #ffd700;
+  text-shadow: 0 0 10px gold;
+  z-index: 10;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#comboDisplay.visible {
+  opacity: 1;
+  animation: comboPop 0.4s ease-out;
+}
+@keyframes comboPop {
+  0% { transform: translateX(-50%) scale(1.2); }
+  50% { transform: translateX(-50%) scale(1.4); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+
+#pauseBtn {
+  position: fixed;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  right: max(10px, env(safe-area-inset-right));
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #00ffcc;
+  background: rgba(0,0,0,0.5);
+  color: #00ffcc;
+  font-size: 22px;
+  cursor: pointer;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 10px rgba(0,255,204,0.5);
+}
+#hud.visible #pauseBtn { display: flex; }
+#pauseBtn:hover { background: rgba(0,255,204,0.2); transform: scale(1.05); }
+#pauseBtn:active { transform: scale(0.98); }
+
+/* Countdown overlay */
+#countdownOverlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  background: rgba(0,0,0,0.3);
+  pointer-events: none;
+}
+#countdownOverlay.visible {
+  display: flex;
+}
+#countdownNum {
+  font-size: clamp(80px, 25vw, 140px);
+  font-weight: bold;
+  color: #00ffcc;
+  text-shadow: 0 0 40px #00ffcc;
+  animation: countdownPulse 0.8s ease-out;
+}
+@keyframes countdownPulse {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Floating score text */
+#floatContainer, #particleContainer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 8;
+}
+.float-text {
+  position: fixed;
+  font-size: 28px;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 0 0 8px gold;
+  animation: floatUp 0.8s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes floatUp {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
+}
+.float-text.bonus { color: #00ffcc; text-shadow: 0 0 8px #00ffcc; }
+
+/* Particles */
+.particle {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: particleFly 0.6s ease-out forwards;
+}
+@keyframes particleFly {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+}
 
 /* Player - center follows cursor */
 #player {
@@ -107,6 +237,28 @@ body.playing {
 
 #player.visible {
   display: block;
+}
+
+/* Full-screen touch layer: only active during play so all touches move the player */
+#touchLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  touch-action: none;
+}
+#touchLayer.active {
+  pointer-events: auto;
+}
+
+/* Bigger player on small (touch) screens */
+@media (max-width: 600px), (hover: none) {
+  #player {
+    width: 72px;
+    height: 72px;
+    margin-left: -36px;
+    margin-top: -36px;
+  }
 }
 
 /* Coins & Powerups */
@@ -179,9 +331,34 @@ body.playing {
   color: #00ffcc;
 }
 
+#gameOverStats {
+  font-size: 16px;
+  color: rgba(255,255,255,0.9);
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+#newRecordBanner {
+  font-size: 22px;
+  color: #ffd700;
+  margin: 10px 0;
+  opacity: 0;
+  animation: none;
+}
+#newRecordBanner.visible {
+  opacity: 1;
+  animation: recordPulse 0.6s ease-out;
+}
+@keyframes recordPulse {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
 #restartBtn {
   margin-top: 20px;
-  padding: 12px 25px;
+  padding: 14px 28px;
+  min-height: 48px;
   font-size: 20px;
   background: linear-gradient(to right, #ff416c, #ff4b2b);
   color: white;
@@ -190,6 +367,7 @@ body.playing {
   cursor: pointer;
   box-shadow: 0 0 15px #ff4b2b;
   transition: transform 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #restartBtn:hover {
