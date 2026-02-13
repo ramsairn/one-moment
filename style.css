@@ -8,10 +8,19 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+/* New background theme: warm sunset / desert sky */
 body {
   margin: 0;
   overflow: hidden;
-  background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+  background: linear-gradient(180deg,
+    #1a0a2e 0%,
+    #2d1b4e 25%,
+    #4a2c6a 50%,
+    #6b3a7a 75%,
+    #8b4a6e 85%,
+    #c45c4a 95%,
+    #e88a5a 100%
+  );
   font-family: 'Trebuchet MS', sans-serif;
   color: white;
   text-align: center;
@@ -47,20 +56,22 @@ body.collect-flash {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-  color: #00ffcc;
+  color: #ffd89b;
   z-index: 100;
   cursor: default;
+  text-shadow: 0 0 20px rgba(255, 200, 100, 0.8);
 }
 
 #startScreen h1 {
   font-size: 48px;
-  text-shadow: 0 0 20px #00ffcc;
+  text-shadow: 0 0 25px #ffd89b, 0 0 40px #e88a5a;
 }
 
 .controls-hint {
   font-size: 16px;
   margin: 10px 0;
-  opacity: 0.9;
+  opacity: 0.95;
+  color: rgba(255,255,255,0.9);
 }
 
 #startBtn {
@@ -68,18 +79,19 @@ body.collect-flash {
   padding: 14px 28px;
   min-height: 48px;
   font-size: 20px;
-  background: linear-gradient(to right, #00ffcc, #0099ff);
-  color: black;
+  background: linear-gradient(135deg, #e88a5a, #c45c4a);
+  color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 0 15px #00ffcc;
-  transition: transform 0.2s ease;
+  box-shadow: 0 4px 20px rgba(232, 138, 90, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 #startBtn:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
+  box-shadow: 0 6px 28px rgba(232, 138, 90, 0.6);
 }
 
 /* HUD */
@@ -96,13 +108,14 @@ body.collect-flash {
   position: fixed;
   top: max(10px, env(safe-area-inset-top));
   padding: 8px 15px;
-  border: 2px solid #00ffcc;
-  border-radius: 8px;
-  background: rgba(0,0,0,0.5);
+  border: 2px solid rgba(255, 216, 155, 0.8);
+  border-radius: 10px;
+  background: rgba(26, 10, 46, 0.75);
   font-size: clamp(16px, 4vw, 20px);
   font-weight: bold;
   z-index: 10;
-  box-shadow: 0 0 10px #00ffcc;
+  box-shadow: 0 0 15px rgba(255, 216, 155, 0.3);
+  color: #ffd89b;
 }
 
 #score { left: max(10px, env(safe-area-inset-left)); }
@@ -115,8 +128,8 @@ body.collect-flash {
   top: 55px;
   transform: translateX(-50%);
   font-size: 18px;
-  color: #ffd700;
-  text-shadow: 0 0 10px gold;
+  color: #ffd89b;
+  text-shadow: 0 0 10px rgba(255, 216, 155, 0.8);
   z-index: 10;
   opacity: 0;
   transition: opacity 0.2s;
@@ -138,9 +151,9 @@ body.collect-flash {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 2px solid #00ffcc;
-  background: rgba(0,0,0,0.5);
-  color: #00ffcc;
+  border: 2px solid rgba(255, 216, 155, 0.8);
+  background: rgba(26, 10, 46, 0.75);
+  color: #ffd89b;
   font-size: 22px;
   cursor: pointer;
   z-index: 20;
@@ -148,10 +161,10 @@ body.collect-flash {
   align-items: center;
   justify-content: center;
   -webkit-tap-highlight-color: transparent;
-  box-shadow: 0 0 10px rgba(0,255,204,0.5);
+  box-shadow: 0 0 15px rgba(255, 216, 155, 0.3);
 }
 #hud.visible #pauseBtn { display: flex; }
-#pauseBtn:hover { background: rgba(0,255,204,0.2); transform: scale(1.05); }
+#pauseBtn:hover { background: rgba(255, 216, 155, 0.2); transform: scale(1.05); }
 #pauseBtn:active { transform: scale(0.98); }
 
 /* Countdown overlay */
@@ -171,8 +184,8 @@ body.collect-flash {
 #countdownNum {
   font-size: clamp(80px, 25vw, 140px);
   font-weight: bold;
-  color: #00ffcc;
-  text-shadow: 0 0 40px #00ffcc;
+  color: #ffd89b;
+  text-shadow: 0 0 40px #e88a5a;
   animation: countdownPulse 0.8s ease-out;
 }
 @keyframes countdownPulse {
@@ -192,8 +205,8 @@ body.collect-flash {
   position: fixed;
   font-size: 28px;
   font-weight: bold;
-  color: #ffd700;
-  text-shadow: 0 0 8px gold;
+  color: #ffd89b;
+  text-shadow: 0 0 8px #e88a5a;
   animation: floatUp 0.8s ease-out forwards;
   pointer-events: none;
 }
@@ -201,7 +214,7 @@ body.collect-flash {
   0% { transform: translateY(0) scale(1); opacity: 1; }
   100% { transform: translateY(-60px) scale(1.2); opacity: 0; }
 }
-.float-text.bonus { color: #00ffcc; text-shadow: 0 0 8px #00ffcc; }
+.float-text.bonus { color: #7dd3fc; text-shadow: 0 0 8px #38bdf8; }
 
 /* Particles */
 .particle {
@@ -217,57 +230,64 @@ body.collect-flash {
   100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
 }
 
-/* Player - UFO collector saucer */
+/* Player - unique crystal orb / magic ball style */
 #player {
   width: 60px;
   height: 60px;
   position: fixed;
-  left: 50%;
-  top: 70%;
-  margin-left: -30px;
-  margin-top: -30px;
+  left: 0;
+  top: 0;
+  margin: 0;
   pointer-events: none;
   z-index: 5;
   display: none;
-  transition: transform 0.05s ease-out;
 }
 
 #player::before {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 56px;
-  height: 56px;
-  background: radial-gradient(ellipse 80% 40% at 50% 70%, #2d5a7b, #1a365d 50%, #0f2744);
+  inset: 0;
   border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(255, 255, 255, 0.95),
+    rgba(200, 230, 255, 0.85) 25%,
+    rgba(120, 200, 255, 0.7) 50%,
+    rgba(80, 150, 255, 0.5) 75%,
+    rgba(60, 100, 200, 0.3)
+  );
   box-shadow:
-    inset 0 8px 20px rgba(100, 200, 255, 0.25),
-    0 0 0 3px rgba(100, 200, 255, 0.6),
-    0 0 25px rgba(80, 180, 255, 0.5);
+    inset -5px -5px 15px rgba(255, 255, 255, 0.6),
+    inset 5px 5px 15px rgba(0, 50, 120, 0.4),
+    0 0 0 2px rgba(255, 255, 255, 0.4),
+    0 0 25px rgba(100, 180, 255, 0.6),
+    0 0 50px rgba(80, 150, 255, 0.3);
+  animation: orbPulse 2s ease-in-out infinite;
 }
 
 #player::after {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 28px;
-  height: 18px;
-  background: radial-gradient(ellipse 100% 100% at 50% 30%, #7dd3fc, #38bdf8 40%, #0ea5e9);
-  border-radius: 50% 50% 45% 45%;
-  box-shadow:
-    inset 0 -2px 8px rgba(255,255,255,0.4),
-    0 0 12px rgba(56, 189, 248, 0.6);
+  inset: 4px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(255, 255, 255, 0.5),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); box-shadow: inset -5px -5px 15px rgba(255,255,255,0.6), inset 5px 5px 15px rgba(0,50,120,0.4), 0 0 0 2px rgba(255,255,255,0.4), 0 0 25px rgba(100,180,255,0.6), 0 0 50px rgba(80,150,255,0.3); }
+  50% { transform: scale(1.03); box-shadow: inset -5px -5px 15px rgba(255,255,255,0.7), inset 5px 5px 15px rgba(0,50,120,0.4), 0 0 0 2px rgba(255,255,255,0.5), 0 0 30px rgba(100,180,255,0.7), 0 0 60px rgba(80,150,255,0.4); }
 }
 
 #player.visible {
   display: block;
 }
 
-/* Full-screen touch layer: only active during play so all touches move the player */
+/* Full-screen touch layer */
 #touchLayer {
   position: fixed;
   inset: 0;
@@ -277,23 +297,13 @@ body.collect-flash {
 }
 #touchLayer.active {
   pointer-events: auto;
+  background: rgba(0,0,0,0.001);
 }
 
-/* Bigger player on small (touch) screens */
 @media (max-width: 600px), (hover: none) {
   #player {
     width: 72px;
     height: 72px;
-    margin-left: -36px;
-    margin-top: -36px;
-  }
-  #player::before {
-    width: 68px;
-    height: 68px;
-  }
-  #player::after {
-    width: 34px;
-    height: 22px;
   }
 }
 
@@ -308,23 +318,23 @@ body.collect-flash {
 }
 
 .coin {
-  background: radial-gradient(circle, gold, orange);
-  box-shadow: 0 0 15px gold;
+  background: radial-gradient(circle at 30% 30%, #ffd89b, #e88a5a 60%, #c45c4a);
+  box-shadow: 0 0 20px rgba(255, 216, 155, 0.6), inset 0 2px 8px rgba(255,255,255,0.4);
 }
 
 .powerup.blue {
-  background: radial-gradient(circle, dodgerblue, navy);
-  box-shadow: 0 0 15px dodgerblue;
+  background: radial-gradient(circle at 30% 30%, #7dd3fc, #38bdf8 60%, #0ea5e9);
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
 }
 
 .powerup.red {
-  background: radial-gradient(circle, crimson, darkred);
-  box-shadow: 0 0 15px crimson;
+  background: radial-gradient(circle at 30% 30%, #fca5a5, #ef4444 60%, #b91c1c);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
 }
 
 .powerup.heart {
-  background: radial-gradient(circle, pink, red);
-  box-shadow: 0 0 15px pink;
+  background: radial-gradient(circle at 30% 30%, #f9a8d4, #ec4899 60%, #be185d);
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.6);
   animation: pulse 1s infinite alternate;
 }
 
@@ -348,6 +358,8 @@ body.collect-flash {
   z-index: 100;
   display: none;
   cursor: default;
+  color: #ffd89b;
+  text-shadow: 0 0 20px rgba(232, 138, 90, 0.6);
 }
 
 #gameOverScreen.visible {
@@ -357,14 +369,14 @@ body.collect-flash {
 #gameOver {
   font-size: 40px;
   font-weight: bold;
-  color: #ff4444;
-  text-shadow: 0 0 20px #ff0000;
+  color: #fca5a5;
+  text-shadow: 0 0 25px #ef4444;
 }
 
 #finalScore {
   font-size: 24px;
   margin: 15px 0;
-  color: #00ffcc;
+  color: #ffd89b;
 }
 
 #gameOverStats {
@@ -376,7 +388,7 @@ body.collect-flash {
 
 #newRecordBanner {
   font-size: 22px;
-  color: #ffd700;
+  color: #ffd89b;
   margin: 10px 0;
   opacity: 0;
   animation: none;
@@ -396,16 +408,16 @@ body.collect-flash {
   padding: 14px 28px;
   min-height: 48px;
   font-size: 20px;
-  background: linear-gradient(to right, #ff416c, #ff4b2b);
+  background: linear-gradient(135deg, #e88a5a, #c45c4a);
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 0 15px #ff4b2b;
+  box-shadow: 0 4px 20px rgba(232, 138, 90, 0.5);
   transition: transform 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
 #restartBtn:hover {
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
