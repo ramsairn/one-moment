@@ -88,6 +88,7 @@ function createCoin() {
         score++;
       }
       scoreText.innerText = "Score: " + score;
+      updateLevel();
       coin.remove();
       return;
     }
@@ -131,3 +132,8 @@ restartBtn.addEventListener("click", function() {
   score = 0;
   lives = 3;
   scoreText.innerText = "Score: 0";
+  livesText.innerText = "Lives: 3";
+  gameOver = false;
+  gameOverText.style.display = "none";
+  restartBtn.style.display = "none";
+  coinInterval = setInterval(createCoin, 1000);
