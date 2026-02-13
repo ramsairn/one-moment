@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
   <title>Coin Collector Arcade</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
@@ -10,7 +14,7 @@
 <div id="startScreen">
   <h1>✨ Coin Collector ✨</h1>
   <p>Collect coins, grab power-ups, and beat your high score!</p>
-  <p class="controls-hint">Move your mouse or finger to control the collector.</p>
+  <p class="controls-hint">Desktop: move the mouse. Mobile: drag your finger to move the collector.</p>
   <button id="startBtn">Play</button>
 </div>
 
@@ -18,13 +22,26 @@
   <div id="score">Score: 0</div>
   <div id="highScore">High Score: 0</div>
   <div id="lives">Lives: 3</div>
+  <div id="comboDisplay"></div>
+  <button id="pauseBtn" type="button" aria-label="Pause">⏸</button>
+</div>
+
+<div id="countdownOverlay">
+  <span id="countdownNum">3</span>
 </div>
 
 <div id="player"></div>
+<div id="floatContainer" aria-hidden="true"></div>
+<div id="particleContainer" aria-hidden="true"></div>
+
+<!-- Full-screen touch layer: captures all touches during play so mobile doesn't scroll/zoom -->
+<div id="touchLayer" aria-hidden="true"></div>
 
 <div id="gameOverScreen">
   <div id="gameOver">Game Over!</div>
   <p id="finalScore"></p>
+  <div id="gameOverStats"></div>
+  <p id="newRecordBanner">🏆 New record!</p>
   <button id="restartBtn">Restart</button>
 </div>
 
