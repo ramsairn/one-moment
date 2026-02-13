@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 body {
   margin: 0;
   overflow: hidden;
@@ -5,6 +9,15 @@ body {
   font-family: 'Trebuchet MS', sans-serif;
   color: white;
   text-align: center;
+  min-height: 100vh;
+  cursor: default;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+body.playing {
+  cursor: none; /* hide cursor during gameplay so the green circle is your control */
 }
 
 /* Start Screen */
@@ -15,12 +28,21 @@ body {
   transform: translate(-50%, -50%);
   text-align: center;
   color: #00ffcc;
-  z-index: 20;
+  z-index: 100;
+  cursor: default;
 }
+
 #startScreen h1 {
   font-size: 48px;
   text-shadow: 0 0 20px #00ffcc;
 }
+
+.controls-hint {
+  font-size: 16px;
+  margin: 10px 0;
+  opacity: 0.9;
+}
+
 #startBtn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -31,11 +53,23 @@ body {
   border-radius: 8px;
   cursor: pointer;
   box-shadow: 0 0 15px #00ffcc;
+  transition: transform 0.2s ease;
 }
-#startBtn:hover { transform: scale(1.1); }
+
+#startBtn:hover {
+  transform: scale(1.1);
+}
 
 /* HUD */
-#hud { display: none; }
+#hud {
+  display: none;
+  z-index: 10;
+}
+
+#hud.visible {
+  display: block;
+}
+
 #score, #lives, #highScore {
   position: fixed;
   top: 10px;
@@ -48,23 +82,31 @@ body {
   z-index: 10;
   box-shadow: 0 0 10px #00ffcc;
 }
+
 #score { left: 10px; }
 #lives { right: 10px; }
 #highScore { left: 50%; transform: translateX(-50%); }
 
-/* Player */
+/* Player - center follows cursor */
 #player {
   width: 60px;
   height: 60px;
   background: radial-gradient(circle, lime, green);
   border-radius: 50%;
-  position: absolute;
+  position: fixed;
   left: 50%;
-  top: 85%;
-  transform: translate(-50%, -50%);
+  top: 70%;
+  margin-left: -30px;
+  margin-top: -30px;
   box-shadow: 0 0 20px lime;
-  transition: transform 0.1s ease;
+  pointer-events: none;
+  z-index: 5;
   display: none;
+  transition: transform 0.05s ease-out;
+}
+
+#player.visible {
+  display: block;
 }
 
 /* Coins & Powerups */
@@ -72,43 +114,71 @@ body {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  position: absolute;
+  position: fixed;
   animation: spin 1s linear infinite;
+  pointer-events: none;
 }
+
 .coin {
   background: radial-gradient(circle, gold, orange);
   box-shadow: 0 0 15px gold;
 }
+
 .powerup.blue {
   background: radial-gradient(circle, dodgerblue, navy);
   box-shadow: 0 0 15px dodgerblue;
 }
+
 .powerup.red {
   background: radial-gradient(circle, crimson, darkred);
   box-shadow: 0 0 15px crimson;
 }
+
 .powerup.heart {
   background: radial-gradient(circle, pink, red);
   box-shadow: 0 0 15px pink;
   animation: pulse 1s infinite alternate;
 }
 
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 
-/* Game Over */
-#gameOver {
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
+
+/* Game Over Screen */
+#gameOverScreen {
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 100;
+  display: none;
+  cursor: default;
+}
+
+#gameOverScreen.visible {
+  display: block;
+}
+
+#gameOver {
   font-size: 40px;
   font-weight: bold;
   color: #ff4444;
   text-shadow: 0 0 20px #ff0000;
-  display: none;
-  z-index: 20;
 }
+
+#finalScore {
+  font-size: 24px;
+  margin: 15px 0;
+  color: #00ffcc;
+}
+
 #restartBtn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -118,8 +188,10 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  display: none;
   box-shadow: 0 0 15px #ff4b2b;
   transition: transform 0.2s ease;
 }
-#restartBtn:hover { transform: scale(1.1); }
+
+#restartBtn:hover {
+  transform: scale(1.1);
+}
