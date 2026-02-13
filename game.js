@@ -37,16 +37,18 @@ let playerX = window.innerWidth / 2;
 let playerY = window.innerHeight * 0.7;
 let playerTargetX = playerX;
 let playerTargetY = playerY;
-const LERP = 0.18;
+const LERP = 0.35;
 
 const COIN_SIZE = 40;
 const HITBOX_PAD = 12;
 const isTouchDevice = () => "ontouchstart" in window || navigator.maxTouchPoints > 0;
 
-// Use visualViewport on mobile for correct dimensions (address bar, keyboard)
+// Use visualViewport on mobile; fallback so width/height are never 0 or tiny
 function getViewport() {
   const v = window.visualViewport;
-  return v ? { w: v.width, h: v.height } : { w: window.innerWidth, h: window.innerHeight };
+  const w = (v ? v.width : window.innerWidth) || document.documentElement.clientWidth || 300;
+  const h = (v ? v.height : window.innerHeight) || document.documentElement.clientHeight || 300;
+  return { w: Math.max(w, 200), h: Math.max(h, 200) };
 }
 
 function vibrate(ms) {
@@ -113,9 +115,19 @@ function isPlaying() {
 
 function setPositionFromEvent(clientX, clientY) {
   const vp = getViewport();
-  const half = player ? player.offsetWidth / 2 : 36;
-  playerTargetX = Math.max(half, Math.min(vp.w - half, clientX));
-  playerTargetY = Math.max(half, Math.min(vp.h - half, clientY));
+  const half = (player && player.offsetWidth) ? player.offsetWidth / 2 : 36;
+  const minX = half;
+  const maxX = vp.w - half;
+  const minY = half;
+  const maxY = vp.h - half;
+  playerTargetX = Math.max(minX, Math.min(maxX, clientX));
+  playerTargetY = Math.max(minY, Math.min(maxY, clientY));
+}
+
+function snapPlayerToTarget() {
+  playerX = playerTargetX;
+  playerY = playerTargetY;
+  updatePlayerPosition();
 }
 
 function tickPlayer() {
@@ -136,13 +148,16 @@ document.addEventListener("mousemove", function (e) {
   setPositionFromEvent(e.clientX, e.clientY);
 });
 
-// --- Touch: use touchLayer when playing so nothing scrolls/zooms; touchstart + touchmove ---
+// --- Touch: use touchLayer when playing; snap on first touch so left/right works right away ---
 if (touchLayer) {
   touchLayer.addEventListener("touchstart", function (e) {
     if (!isPlaying()) return;
     e.preventDefault();
     const t = e.touches[0];
-    if (t) setPositionFromEvent(t.clientX, t.clientY);
+    if (t) {
+      setPositionFromEvent(t.clientX, t.clientY);
+      snapPlayerToTarget();
+    }
   }, { passive: false });
 
   touchLayer.addEventListener("touchmove", function (e) {
@@ -166,7 +181,10 @@ document.addEventListener("touchstart", function (e) {
   if (!isPlaying()) return;
   if (e.target.closest("#startScreen, #gameOverScreen")) return;
   const t = e.touches[0];
-  if (t) setPositionFromEvent(t.clientX, t.clientY);
+  if (t) {
+    setPositionFromEvent(t.clientX, t.clientY);
+    snapPlayerToTarget();
+  }
 }, { passive: true });
 
 // --- Start game ---
