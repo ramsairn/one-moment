@@ -4,12 +4,16 @@ let livesText = document.getElementById("lives");
 let highScoreText = document.getElementById("highScore");
 let gameOverText = document.getElementById("gameOver");
 let restartBtn = document.getElementById("restartBtn");
+let startScreen = document.getElementById("startScreen");
+let startBtn = document.getElementById("startBtn");
+let hud = document.getElementById("hud");
 
 let score = 0;
 let lives = 3;
 let highScore = localStorage.getItem("coinHighScore") || 0;
 highScoreText.innerText = "High Score: " + highScore;
 let gameOver = false;
+let coinInterval;
 
 let playerX = window.innerWidth / 2;
 let playerY = window.innerHeight * 0.7;
@@ -88,7 +92,6 @@ function createCoin() {
         score++;
       }
       scoreText.innerText = "Score: " + score;
-      updateLevel();
       coin.remove();
       return;
     }
@@ -99,41 +102,4 @@ function createCoin() {
         lives--;
         livesText.innerText = "Lives: " + lives;
         if (lives <= 0) {
-          endGame();
-        }
-      }
-      coin.remove();
-      return;
-    }
-
-    requestAnimationFrame(fall);
-  }
-
-  fall();
-}
-
-// Spawn coins periodically
-let coinInterval = setInterval(createCoin, 1000);
-
-function endGame() {
-  gameOver = true;
-  gameOverText.style.display = "block";
-  restartBtn.style.display = "inline-block";
-  clearInterval(coinInterval);
-
-  if (score > highScore) {
-    highScore = score;
-    localStorage.setItem("coinHighScore", highScore);
-    highScoreText.innerText = "High Score: " + highScore;
-  }
-}
-
-restartBtn.addEventListener("click", function() {
-  score = 0;
-  lives = 3;
-  scoreText.innerText = "Score: 0";
-  livesText.innerText = "Lives: 3";
-  gameOver = false;
-  gameOverText.style.display = "none";
-  restartBtn.style.display = "none";
-  coinInterval = setInterval(createCoin, 1000);
+          endGame
