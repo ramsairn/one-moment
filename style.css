@@ -15,6 +15,7 @@ body {
   transform: translate(-50%, -50%);
   text-align: center;
   color: #00ffcc;
+  z-index: 20;
 }
 #startScreen h1 {
   font-size: 48px;
@@ -59,7 +60,7 @@ body {
   border-radius: 50%;
   position: absolute;
   left: 50%;
-  top: 70%;
+  top: 85%;
   transform: translate(-50%, -50%);
   box-shadow: 0 0 20px lime;
   transition: transform 0.1s ease;
@@ -106,6 +107,7 @@ body {
   color: #ff4444;
   text-shadow: 0 0 20px #ff0000;
   display: none;
+  z-index: 20;
 }
 #restartBtn {
   margin-top: 20px;
