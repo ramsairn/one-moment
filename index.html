@@ -1,28 +1,290 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Coin Collector Arcade</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Coin Collector Arcade</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+      font-family: 'Trebuchet MS', sans-serif;
+      color: white;
+      text-align: center;
+      user-select: none;
+      touch-action: none; /* Prevents scrolling on mobile */
+    }
+
+    /* Start Screen */
+    #startScreen {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #00ffcc;
+      z-index: 20;
+    }
+
+    #startScreen h1 {
+      font-size: 48px;
+      text-shadow: 0 0 20px #00ffcc;
+    }
+
+    #startBtn {
+      margin-top: 20px;
+      padding: 12px 25px;
+      font-size: 20px;
+      background: linear-gradient(to right, #00ffcc, #0099ff);
+      color: black;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffcc;
+    }
+
+    /* HUD */
+    #hud { display: none; }
+    #score, #lives, #highScore {
+      position: fixed;
+      top: 10px;
+      padding: 8px 15px;
+      border: 2px solid #00ffcc;
+      border-radius: 8px;
+      background: rgba(0,0,0,0.5);
+      font-size: 20px;
+      font-weight: bold;
+      z-index: 10;
+    }
+    #score { left: 10px; }
+    #lives { right: 10px; }
+    #highScore { left: 50%; transform: translateX(-50%); }
+
+    /* Player */
+    #player {
+      width: 60px;
+      height: 60px;
+      background: radial-gradient(circle, lime, green);
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      top: 85%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 20px lime;
+      display: none;
+      z-index: 5;
+    }
+
+    /* Items */
+    .coin, .powerup {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+    }
+    .coin {
+      background: radial-gradient(circle, gold, orange);
+      box-shadow: 0 0 15px gold;
+    }
+    .powerup.blue { background: radial-gradient(circle, dodgerblue, navy); box-shadow: 0 0 15px dodgerblue; }
+    .powerup.red { background: radial-gradient(circle, crimson, darkred); box-shadow: 0 0 15px crimson; }
+    .powerup.heart { background: radial-gradient(circle, pink, red); box-shadow: 0 0 15px pink; }
+
+    /* Game Over */
+    #gameOverUI {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 30;
+      display: none;
+    }
+    #gameOverText {
+      font-size: 50px;
+      color: #ff4444;
+      text-shadow: 0 0 20px red;
+      margin-bottom: 20px;
+    }
+    #restartBtn {
+      padding: 12px 25px;
+      font-size: 20px;
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body>
 
-<div id="startScreen">
-  <h1>✨ Coin Collector ✨</h1>
-  <p>Collect coins, grab power-ups, and beat your high score!</p>
-  <button id="startBtn">Play</button>
-</div>
+  <div id="startScreen">
+    <h1>✨ Coin Collector ✨</h1>
+    <p>Collect coins, grab power-ups, and survive!</p>
+    <button id="startBtn">Play Game</button>
+  </div>
 
-<div id="hud">
-  <div id="score">Score: 0</div>
-  <div id="highScore">High Score: 0</div>
-  <div id="lives">Lives: 3</div>
-</div>
+  <div id="hud">
+    <div id="score">Score: 0</div>
+    <div id="highScore">High Score: 0</div>
+    <div id="lives">Lives: 3</div>
+  </div>
 
-<div id="player"></div>
-<div id="gameOver">Game Over!</div>
-<button id="restartBtn">Restart</button>
+  <div id="player"></div>
 
-<script src="game.js"></script>
+  <div id="gameOverUI">
+    <div id="gameOverText">GAME OVER</div>
+    <button id="restartBtn">Restart</button>
+  </div>
+
+  <script>
+    const player = document.getElementById("player");
+    const scoreText = document.getElementById("score");
+    const livesText = document.getElementById("lives");
+    const highScoreText = document.getElementById("highScore");
+    const hud = document.getElementById("hud");
+    const startScreen = document.getElementById("startScreen");
+    const gameOverUI = document.getElementById("gameOverUI");
+    
+    let score = 0;
+    let lives = 3;
+    let gameOver = true; // Start in true so loop doesn't run early
+    let highScore = parseInt(localStorage.getItem("coinHighScore")) || 0;
+    highScoreText.innerText = `High Score: ${highScore}`;
+
+    let coinInterval;
+    let slowUntil = 0;
+    let playerX = window.innerWidth / 2;
+    let playerY = window.innerHeight * 0.85;
+
+    function updatePlayerPosition() {
+      player.style.left = playerX + "px";
+      player.style.top = playerY + "px";
+    }
+
+    function startGame() {
+      // Logic Reset
+      score = 0;
+      lives = 3;
+      gameOver = false;
+      
+      // UI Reset
+      scoreText.innerText = `Score: ${score}`;
+      livesText.innerText = `Lives: ${lives}`;
+      startScreen.style.display = "none";
+      gameOverUI.style.display = "none";
+      hud.style.display = "block";
+      player.style.display = "block";
+
+      // Spawn Loop
+      if (coinInterval) clearInterval(coinInterval);
+      coinInterval = setInterval(createCoin, 800);
+    }
+
+    function endGame() {
+      gameOver = true;
+      clearInterval(coinInterval);
+      
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("coinHighScore", highScore);
+        highScoreText.innerText = `High Score: ${highScore}`;
+      }
+      
+      player.style.display = "none";
+      gameOverUI.style.display = "block";
+    }
+
+    // Input Listeners
+    document.addEventListener("mousemove", (e) => {
+      if (!gameOver) {
+        playerX = e.clientX;
+        playerX = Math.max(30, Math.min(window.innerWidth - 30, playerX));
+        updatePlayerPosition();
+      }
+    });
+
+    document.addEventListener("touchmove", (e) => {
+      if (!gameOver) {
+        playerX = e.touches[0].clientX;
+        playerX = Math.max(30, Math.min(window.innerWidth - 30, playerX));
+        updatePlayerPosition();
+      }
+    }, { passive: false });
+
+    document.getElementById("startBtn").onclick = startGame;
+    document.getElementById("restartBtn").onclick = startGame;
+
+    function createCoin() {
+      if (gameOver) return;
+
+      const coin = document.createElement("div");
+      let rand = Math.random();
+
+      // Item Types
+      if (rand < 0.08) {
+        coin.className = "powerup blue"; // Points
+      } else if (rand < 0.13) {
+        coin.className = "powerup red"; // Slow motion
+      } else if (rand < 0.16) {
+        coin.className = "powerup heart"; // Extra Life
+      } else {
+        coin.className = "coin";
+      }
+
+      let x = Math.random() * (window.innerWidth - 40);
+      coin.style.left = x + "px";
+      coin.style.top = "-50px";
+      document.body.appendChild(coin);
+
+      let fallSpeed = 3 + Math.random() * 2 + (score * 0.05);
+      
+      function fall() {
+        if (gameOver) {
+          coin.remove();
+          return;
+        }
+
+        let currentTop = parseFloat(coin.style.top);
+        let speed = (Date.now() < slowUntil) ? fallSpeed * 0.4 : fallSpeed;
+        coin.style.top = (currentTop + speed) + "px";
+
+        // Collision Check
+        let coinRect = coin.getBoundingClientRect();
+        let playerRect = player.getBoundingClientRect();
+
+        if (
+          coinRect.left < playerRect.right &&
+          coinRect.right > playerRect.left &&
+          coinRect.top < playerRect.bottom &&
+          coinRect.bottom > playerRect.top
+        ) {
+          if (coin.classList.contains("blue")) score += 5;
+          else if (coin.classList.contains("red")) { slowUntil = Date.now() + 3000; score += 2; }
+          else if (coin.classList.contains("heart")) { lives++; livesText.innerText = `Lives: ${lives}`; }
+          else score++;
+
+          scoreText.innerText = `Score: ${score}`;
+          coin.remove();
+          return;
+        }
+
+        // Out of Bounds
+        if (currentTop > window.innerHeight) {
+          if (coin.classList.contains("coin")) {
+            lives--;
+            livesText.innerText = `Lives: ${lives}`;
+            if (lives <= 0) endGame();
+          }
+          coin.remove();
+          return;
+        }
+
+        requestAnimationFrame(fall);
+      }
+      requestAnimationFrame(fall);
+    }
+  </script>
 </body>
 </html>
