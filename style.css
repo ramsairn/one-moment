@@ -1,0 +1,122 @@
+body {
+  margin: 0;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #0f2027, #203a43, #2c5364);
+  font-family: 'Trebuchet MS', sans-serif;
+  color: white;
+  text-align: center;
+}
+
+/* HUD Panels */
+#score, #lives, #highScore {
+  position: fixed;
+  top: 10px;
+  padding: 8px 15px;
+  border: 2px solid #00ffcc;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.5);
+  font-size: 20px;
+  font-weight: bold;
+  z-index: 10;
+  box-shadow: 0 0 10px #00ffcc;
+}
+#score { left: 10px; }
+#lives { right: 10px; }
+#highScore { left: 50%; transform: translateX(-50%); }
+
+/* Player */
+#player {
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, lime, green);
+  border-radius: 50%;
+  position: absolute;
+  left: 50%;
+  top: 70%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 20px lime;
+  transition: transform 0.1s ease;
+}
+
+/* Coins */
+.coin {
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, gold, orange);
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: 0 0 15px gold;
+  animation: spin 1s linear infinite;
+}
+
+/* Power-ups */
+.powerup.blue {
+  background: radial-gradient(circle, dodgerblue, navy);
+  box-shadow: 0 0 15px dodgerblue;
+  animation: spin 1s linear infinite;
+}
+.powerup.red {
+  background: radial-gradient(circle, crimson, darkred);
+  box-shadow: 0 0 15px crimson;
+  animation: spin 1s linear infinite;
+}
+.powerup.heart {
+  background: radial-gradient(circle, pink, red);
+  box-shadow: 0 0 15px pink;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+@keyframes pulse {
+  from { transform: scale(1); }
+  to { transform: scale(1.2); }
+}
+
+/* Stars */
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: twinkle 3s infinite alternate;
+}
+@keyframes twinkle {
+  from { opacity: 0.2; }
+  to { opacity: 1; }
+}
+
+/* Game Over */
+#gameOver {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40px;
+  font-weight: bold;
+  color: #ff4444;
+  text-shadow: 0 0 20px #ff0000;
+  display: none;
+}
+
+/* Restart Button */
+#restartBtn {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 20px;
+  background: linear-gradient(to right, #ff416c, #ff4b2b);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: none;
+  box-shadow: 0 0 15px #ff4b2b;
+  transition: transform 0.2s ease;
+}
+#restartBtn:hover {
+  transform: scale(1.1);
+}
