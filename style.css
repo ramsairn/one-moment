@@ -7,7 +7,34 @@ body {
   text-align: center;
 }
 
-/* HUD Panels */
+/* Start Screen */
+#startScreen {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #00ffcc;
+}
+#startScreen h1 {
+  font-size: 48px;
+  text-shadow: 0 0 20px #00ffcc;
+}
+#startBtn {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 20px;
+  background: linear-gradient(to right, #00ffcc, #0099ff);
+  color: black;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 0 15px #00ffcc;
+}
+#startBtn:hover { transform: scale(1.1); }
+
+/* HUD */
+#hud { display: none; }
 #score, #lives, #highScore {
   position: fixed;
   top: 10px;
@@ -36,29 +63,28 @@ body {
   transform: translate(-50%, -50%);
   box-shadow: 0 0 20px lime;
   transition: transform 0.1s ease;
+  display: none;
 }
 
-/* Coins */
-.coin {
+/* Coins & Powerups */
+.coin, .powerup {
   width: 40px;
   height: 40px;
-  background: radial-gradient(circle, gold, orange);
   border-radius: 50%;
   position: absolute;
-  box-shadow: 0 0 15px gold;
   animation: spin 1s linear infinite;
 }
-
-/* Power-ups */
+.coin {
+  background: radial-gradient(circle, gold, orange);
+  box-shadow: 0 0 15px gold;
+}
 .powerup.blue {
   background: radial-gradient(circle, dodgerblue, navy);
   box-shadow: 0 0 15px dodgerblue;
-  animation: spin 1s linear infinite;
 }
 .powerup.red {
   background: radial-gradient(circle, crimson, darkred);
   box-shadow: 0 0 15px crimson;
-  animation: spin 1s linear infinite;
 }
 .powerup.heart {
   background: radial-gradient(circle, pink, red);
@@ -66,29 +92,8 @@ body {
   animation: pulse 1s infinite alternate;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-@keyframes pulse {
-  from { transform: scale(1); }
-  to { transform: scale(1.2); }
-}
-
-/* Stars */
-.star {
-  position: absolute;
-  width: 2px;
-  height: 2px;
-  background: white;
-  border-radius: 50%;
-  opacity: 0.8;
-  animation: twinkle 3s infinite alternate;
-}
-@keyframes twinkle {
-  from { opacity: 0.2; }
-  to { opacity: 1; }
-}
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.2); } }
 
 /* Game Over */
 #gameOver {
@@ -102,8 +107,6 @@ body {
   text-shadow: 0 0 20px #ff0000;
   display: none;
 }
-
-/* Restart Button */
 #restartBtn {
   margin-top: 20px;
   padding: 12px 25px;
@@ -117,6 +120,4 @@ body {
   box-shadow: 0 0 15px #ff4b2b;
   transition: transform 0.2s ease;
 }
-#restartBtn:hover {
-  transform: scale(1.1);
-}
+#restartBtn:hover { transform: scale(1.1); }
