@@ -217,22 +217,50 @@ body.collect-flash {
   100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
 }
 
-/* Player - center follows cursor */
+/* Player - UFO collector saucer */
 #player {
   width: 60px;
   height: 60px;
-  background: radial-gradient(circle, lime, green);
-  border-radius: 50%;
   position: fixed;
   left: 50%;
   top: 70%;
   margin-left: -30px;
   margin-top: -30px;
-  box-shadow: 0 0 20px lime;
   pointer-events: none;
   z-index: 5;
   display: none;
   transition: transform 0.05s ease-out;
+}
+
+#player::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 56px;
+  height: 56px;
+  background: radial-gradient(ellipse 80% 40% at 50% 70%, #2d5a7b, #1a365d 50%, #0f2744);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 8px 20px rgba(100, 200, 255, 0.25),
+    0 0 0 3px rgba(100, 200, 255, 0.6),
+    0 0 25px rgba(80, 180, 255, 0.5);
+}
+
+#player::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 28px;
+  height: 18px;
+  background: radial-gradient(ellipse 100% 100% at 50% 30%, #7dd3fc, #38bdf8 40%, #0ea5e9);
+  border-radius: 50% 50% 45% 45%;
+  box-shadow:
+    inset 0 -2px 8px rgba(255,255,255,0.4),
+    0 0 12px rgba(56, 189, 248, 0.6);
 }
 
 #player.visible {
@@ -258,6 +286,14 @@ body.collect-flash {
     height: 72px;
     margin-left: -36px;
     margin-top: -36px;
+  }
+  #player::before {
+    width: 68px;
+    height: 68px;
+  }
+  #player::after {
+    width: 34px;
+    height: 22px;
   }
 }
 
