@@ -104,7 +104,7 @@ highScoreText.innerText = "High Score: " + highScore;
 
 function updatePlayerPosition() {
   if (!player) return;
-  const half = player.offsetWidth / 2;
+  const half = (player.offsetWidth || 60) / 2;
   player.style.left = (playerX - half) + "px";
   player.style.top = (playerY - half) + "px";
 }
@@ -130,6 +130,13 @@ function snapPlayerToTarget() {
   updatePlayerPosition();
 }
 
+function movePlayerToEvent(clientX, clientY) {
+  setPositionFromEvent(clientX, clientY);
+  playerX = playerTargetX;
+  playerY = playerTargetY;
+  updatePlayerPosition();
+}
+
 function tickPlayer() {
   if (!gameStarted || gameOver || !player) return;
   const half = player.offsetWidth / 2;
@@ -142,50 +149,38 @@ function tickPlayer() {
 }
 requestAnimationFrame(tickPlayer);
 
-// --- Mouse: only when game is active ---
-document.addEventListener("mousemove", function (e) {
-  if (!isPlaying()) return;
-  setPositionFromEvent(e.clientX, e.clientY);
-});
-
-// --- Touch: use touchLayer when playing; snap on first touch so left/right works right away ---
-if (touchLayer) {
-  touchLayer.addEventListener("touchstart", function (e) {
-    if (!isPlaying()) return;
-    e.preventDefault();
-    const t = e.touches[0];
-    if (t) {
-      setPositionFromEvent(t.clientX, t.clientY);
-      snapPlayerToTarget();
-    }
-  }, { passive: false });
-
-  touchLayer.addEventListener("touchmove", function (e) {
-    if (!isPlaying()) return;
-    e.preventDefault();
-    const t = e.touches[0];
-    if (t) setPositionFromEvent(t.clientX, t.clientY);
-  }, { passive: false });
+// --- Controls: use capture phase on document so we always get events first ---
+function shouldMovePlayer(e) {
+  if (!isPlaying()) return false;
+  if (e.target && e.target.closest && e.target.closest("button")) return false;
+  return true;
 }
 
-// Fallback: body touch (in case touchLayer is missing)
-document.addEventListener("touchmove", function (e) {
-  if (!isPlaying()) return;
-  if (e.target.closest("#startScreen, #gameOverScreen")) return;
-  e.preventDefault();
-  const t = e.touches[0];
-  if (t) setPositionFromEvent(t.clientX, t.clientY);
-}, { passive: false });
+function getEventPosition(e) {
+  if (e.clientX != null) return { x: e.clientX, y: e.clientY };
+  const t = e.touches && e.touches[0];
+  return t ? { x: t.clientX, y: t.clientY } : null;
+}
+
+document.addEventListener("mousemove", function (e) {
+  if (!shouldMovePlayer(e)) return;
+  movePlayerToEvent(e.clientX, e.clientY);
+}, true);
 
 document.addEventListener("touchstart", function (e) {
-  if (!isPlaying()) return;
-  if (e.target.closest("#startScreen, #gameOverScreen")) return;
-  const t = e.touches[0];
-  if (t) {
-    setPositionFromEvent(t.clientX, t.clientY);
-    snapPlayerToTarget();
+  if (!shouldMovePlayer(e)) return;
+  const pos = getEventPosition(e);
+  if (pos) movePlayerToEvent(pos.x, pos.y);
+}, true);
+
+document.addEventListener("touchmove", function (e) {
+  if (!shouldMovePlayer(e)) return;
+  const pos = getEventPosition(e);
+  if (pos) {
+    e.preventDefault();
+    movePlayerToEvent(pos.x, pos.y);
   }
-}, { passive: true });
+}, { capture: true, passive: false });
 
 // --- Start game ---
 function startGame() {
