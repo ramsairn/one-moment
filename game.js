@@ -1,124 +1,143 @@
-let player = document.getElementById("player");
-let scoreText = document.getElementById("score");
-let livesText = document.getElementById("lives");
-let highScoreText = document.getElementById("highScore");
-let gameOverText = document.getElementById("gameOver");
-let restartBtn = document.getElementById("restartBtn");
-let startScreen = document.getElementById("startScreen");
-let startBtn = document.getElementById("startBtn");
-let hud = document.getElementById("hud");
+// --- DOM elements ---
+const player = document.getElementById("player");
+const scoreText = document.getElementById("score");
+const livesText = document.getElementById("lives");
+const highScoreText = document.getElementById("highScore");
+const gameOverScreen = document.getElementById("gameOverScreen");
+const finalScoreText = document.getElementById("finalScore");
+const restartBtn = document.getElementById("restartBtn");
+const startScreen = document.getElementById("startScreen");
+const startBtn = document.getElementById("startBtn");
+const hud = document.getElementById("hud");
 
+// --- Game state ---
 let score = 0;
 let lives = 3;
-let highScore = parseInt(localStorage.getItem("coinHighScore")) || 0;
-highScoreText.innerText = `High Score: ${highScore}`;
+let highScore = parseInt(localStorage.getItem("coinHighScore") || "0", 10);
 let gameOver = false;
-let coinInterval;
-let slowUntil = 0;
+let gameStarted = false;
+let coinInterval = null;
+let slowModeUntil = 0; // timestamp until which fall speed is halved
 
+// Player position (center of the circle)
 let playerX = window.innerWidth / 2;
-let playerY = window.innerHeight * 0.85;
+let playerY = window.innerHeight * 0.7;
+
+const PLAYER_SIZE = 60;
+const COIN_SIZE = 40;
+
+// --- Init display ---
+highScoreText.innerText = "High Score: " + highScore;
 
 function updatePlayerPosition() {
-  player.style.left = playerX + "px";
-  player.style.top = playerY + "px";
+  if (!player) return;
+  player.style.left = (playerX - PLAYER_SIZE / 2) + "px";
+  player.style.top = (playerY - PLAYER_SIZE / 2) + "px";
 }
 
-function resetGame() {
+function isPlaying() {
+  return gameStarted && !gameOver;
+}
+
+// --- Controls: only move when game is active ---
+document.addEventListener("mousemove", function (e) {
+  if (!isPlaying()) return;
+  playerX = e.clientX;
+  playerY = e.clientY;
+  updatePlayerPosition();
+});
+
+document.addEventListener("touchmove", function (e) {
+  e.preventDefault();
+  if (!isPlaying()) return;
+  const touch = e.touches[0];
+  playerX = touch.clientX;
+  playerY = touch.clientY;
+  updatePlayerPosition();
+}, { passive: false });
+
+// --- Start game ---
+function startGame() {
+  gameOver = false;
+  gameStarted = true;
   score = 0;
   lives = 3;
-  gameOver = false;
-  scoreText.innerText = "Score: 0";
-  livesText.innerText = "Lives: 3";
-  playerX = window.innerWidth / 2;
-  playerY = window.innerHeight * 0.85;
-  updatePlayerPosition();
-}
+  slowModeUntil = 0;
 
-function startGame() {
-  resetGame();
-  hud.style.display = "block";
-  player.style.display = "block";
   startScreen.style.display = "none";
-  gameOverText.style.display = "none";
-  restartBtn.style.display = "none";
+  hud.classList.add("visible");
+  player.classList.add("visible");
+  gameOverScreen.classList.remove("visible");
+
+  scoreText.innerText = "Score: " + score;
+  livesText.innerText = "Lives: " + lives;
+  highScoreText.innerText = "High Score: " + highScore;
+
+  document.body.classList.add("playing");
+  playerX = window.innerWidth / 2;
+  playerY = window.innerHeight * 0.7;
+  updatePlayerPosition();
+
+  // Remove any old coins/powerups
+  document.querySelectorAll(".coin, .powerup").forEach((el) => el.remove());
+
   if (coinInterval) clearInterval(coinInterval);
-  coinInterval = setInterval(createCoin, 800);
+  coinInterval = setInterval(createCoin, 900);
 }
 
+// --- End game ---
 function endGame() {
-  clearInterval(coinInterval);
+  gameOver = true;
+  if (coinInterval) {
+    clearInterval(coinInterval);
+    coinInterval = null;
+  }
+  document.querySelectorAll(".coin, .powerup").forEach((el) => el.remove());
+
   if (score > highScore) {
     highScore = score;
     localStorage.setItem("coinHighScore", highScore);
-    highScoreText.innerText = `High Score: ${highScore}`;
+    highScoreText.innerText = "High Score: " + highScore;
   }
-  gameOverText.style.display = "block";
-  restartBtn.style.display = "block";
+
+  finalScoreText.innerText = "Score: " + score + " | High Score: " + highScore;
+  gameOverScreen.classList.add("visible");
+  document.body.classList.remove("playing");
 }
 
-startBtn.addEventListener("click", startGame);
-restartBtn.addEventListener("click", startGame);
-
-// Mouse movement (left/right only, clamped)
-document.addEventListener("mousemove", function(e) {
-  if (!gameOver) {
-    playerX = e.clientX;
-    playerX = Math.max(30, Math.min(window.innerWidth - 30, playerX));
-    updatePlayerPosition();
-  }
+// --- Restart (button) ---
+restartBtn.addEventListener("click", function () {
+  startGame();
 });
 
-// Touch movement (prevent scroll, left/right only)
-document.addEventListener("touchmove", function(e) {
-  e.preventDefault();
-  if (!gameOver && e.touches.length > 0) {
-    let touch = e.touches[0];
-    playerX = touch.clientX;
-    playerX = Math.max(30, Math.min(window.innerWidth - 30, playerX));
-    updatePlayerPosition();
-  }
-}, { passive: false });
-
-// Prevent touch scrolling
-document.addEventListener("touchstart", function(e) {
-  e.preventDefault();
-}, { passive: false });
-document.addEventListener("touchend", function(e) {
-  e.preventDefault();
-}, { passive: false });
-
-// Resize handler
-window.addEventListener("resize", function() {
-  playerY = window.innerHeight * 0.85;
-  playerX = Math.max(30, Math.min(window.innerWidth - 30, playerX));
-  updatePlayerPosition();
+startBtn.addEventListener("click", function () {
+  startGame();
 });
 
-// Create coins or powerups
+// --- Spawn coins / powerups ---
 function createCoin() {
-  if (gameOver) return;
+  if (gameOver || !gameStarted) return;
 
-  let coin = document.createElement("div");
-  let rand = Math.random();
+  const coin = document.createElement("div");
+  const rand = Math.random();
+
   if (rand < 0.1) {
-    coin.classList.add("powerup", "blue"); // +5 points
+    coin.classList.add("powerup", "blue");
   } else if (rand < 0.15) {
-    coin.classList.add("powerup", "red"); // slow down falling globally for 3s
+    coin.classList.add("powerup", "red");
   } else if (rand < 0.18) {
-    coin.classList.add("powerup", "heart"); // +1 life
+    coin.classList.add("powerup", "heart");
   } else {
     coin.classList.add("coin");
   }
 
-  let x = Math.random() * (window.innerWidth - 40);
+  const x = Math.random() * (window.innerWidth - COIN_SIZE);
   coin.style.left = x + "px";
   coin.style.top = "0px";
 
   document.body.appendChild(coin);
 
-  let fallSpeed = 2 + Math.random() * 3 + score * 0.01;
-  if (Date.now() < slowUntil) fallSpeed *= 0.3;
+  let fallSpeed = 2 + Math.random() * 3 + score * 0.05;
 
   function fall() {
     if (gameOver) {
@@ -126,13 +145,15 @@ function createCoin() {
       return;
     }
 
-    let coinTop = parseFloat(coin.style.top) || 0;
-    coin.style.top = (coinTop + fallSpeed) + "px";
+    let mult = 1;
+    if (Date.now() < slowModeUntil) mult = 0.5;
+    let coinTop = parseFloat(coin.style.top);
+    coin.style.top = coinTop + fallSpeed * mult + "px";
 
-    let coinRect = coin.getBoundingClientRect();
-    let playerRect = player.getBoundingClientRect();
+    const coinRect = coin.getBoundingClientRect();
+    const playerRect = player.getBoundingClientRect();
 
-    // Collision detection
+    // Collision
     if (
       coinRect.left < playerRect.right &&
       coinRect.right > playerRect.left &&
@@ -142,27 +163,28 @@ function createCoin() {
       if (coin.classList.contains("blue")) {
         score += 5;
       } else if (coin.classList.contains("red")) {
-        slowUntil = Date.now() + 3000;
-        score += 3;
+        slowModeUntil = Date.now() + 3000;
       } else if (coin.classList.contains("heart")) {
         lives++;
-        livesText.innerText = `Lives: ${lives}`;
+        livesText.innerText = "Lives: " + lives;
       } else {
         score++;
       }
-      scoreText.innerText = `Score: ${score}`;
+      scoreText.innerText = "Score: " + score;
+      if (score > highScore) {
+        highScore = score;
+        highScoreText.innerText = "High Score: " + highScore;
+      }
       coin.remove();
       return;
     }
 
-    // Missed coin
-    if (coinRect.bottom > window.innerHeight) {
+    // Missed: below screen
+    if (coinTop > window.innerHeight - COIN_SIZE) {
       if (!coin.classList.contains("powerup")) {
         lives--;
-        livesText.innerText = `Lives: ${lives}`;
-        if (lives <= 0) {
-          endGame();
-        }
+        livesText.innerText = "Lives: " + lives;
+        if (lives <= 0) endGame();
       }
       coin.remove();
       return;
