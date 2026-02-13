@@ -1,257 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>One Moment — The World Pauses Together</title>
-  <meta name="description" content="A global experiment in mindfulness. Join the world in a moment of reflection.">
-
+  <title>Coin Collector</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <style>
-    :root {
-      --primary: #00f2fe;
-      --secondary: #4facfe;
-      --bg: #0f172a;
-      --glass: rgba(255, 255, 255, 0.05);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
-      background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
-      color: #f8fafc;
-      font-family: 'Inter', -apple-system, sans-serif;
-      display: flex; align-items: center; justify-content: center;
-      height: 100vh; overflow: hidden;
-    }
-
-    .container {
-      text-align: center;
-      padding: 2.5rem;
-      width: 90%;
-      max-width: 500px;
-      background: var(--glass);
-      backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 32px;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      position: relative;
-      z-index: 1;
-    }
-
-    h1 { font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.8; }
-
-    #timer {
-      font-size: 5rem;
-      font-weight: 800;
-      margin: 1.5rem 0;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 15px rgba(79, 172, 254, 0.4));
-    }
-
-    .status-box {
-      margin-bottom: 1.5rem;
-      font-size: 1.1rem;
-      color: #94a3b8;
-    }
-
-    .footer {
-      position: absolute;
-      bottom: 1rem;
-      font-size: 0.8rem;
-      opacity: 0.5;
-      z-index: 1;
-    }
-
-    /* Starry Background */
-    .starry-bg {
-      position: fixed;
-      width: 100%; height: 100%;
-      background: radial-gradient(circle at center, #0f172a 0%, #000 100%);
+      margin: 0;
       overflow: hidden;
-      z-index: -2;
+      background: linear-gradient(to right, #141e30, #243b55);
+      font-family: Arial;
+      color: white;
+      text-align: center;
     }
 
-    .star {
-      position: absolute;
-      width: 2px; height: 2px;
-      background: white;
-      border-radius: 50%;
-      animation: twinkle 3s infinite alternate;
-    }
-
-    @keyframes twinkle {
-      from { opacity: 0.3; transform: scale(1); }
-      to { opacity: 1; transform: scale(1.5); }
-    }
-
-    /* Breathing Guide */
-    .breath-circle {
-      width: 120px; height: 120px;
-      border-radius: 50%;
-      background: var(--secondary);
-      margin: 1.5rem auto;
-      display: none;
-      animation: breathe 8s infinite;
-    }
-
-    @keyframes breathe {
-      0% { transform: scale(1); opacity: 0.6; }
-      50% { transform: scale(1.5); opacity: 1; }
-      100% { transform: scale(1); opacity: 0.6; }
-    }
-
-    /* Gratitude Wall */
-    .gratitude-wall {
-      margin-top: 1.5rem;
-      font-size: 1rem;
-      color: #cbd5e1;
-      opacity: 0.9;
-    }
-
-    #gratitude-feed {
-      margin-top: 1rem;
-      font-style: italic;
-      color: var(--primary);
-      transition: opacity 1s;
-    }
-
-    /* Streak Tracker */
-    .streak-box {
-      margin-top: 1.5rem;
-      font-size: 1rem;
-      color: #facc15;
+    #score {
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 24px;
       font-weight: bold;
+      z-index: 10;
     }
 
-    /* Reflection Prompt */
-    .prompt-box {
-      margin-top: 1.5rem;
-      font-size: 1rem;
-      color: #38bdf8;
+    #player {
+      width: 60px;
+      height: 60px;
+      background: lime;
+      border-radius: 50%;
+      position: absolute;
+      left: 50%;
+      top: 70%;
+      transform: translate(-50%, -50%);
+    }
+
+    .coin {
+      width: 40px;
+      height: 40px;
+      background: gold;
+      border-radius: 50%;
+      position: absolute;
     }
   </style>
 </head>
 <body>
 
-  <div class="starry-bg" id="starryBg"></div>
+<div id="score">Score: 0</div>
+<div id="player"></div>
 
-  <div class="container">
-    <h1>Next Global Moment</h1>
-    <div id="timer">00:00</div>
-    
-    <div class="status-box" id="status">
-      Synchronizing with global clock...
-    </div>
+<script>
+let player = document.getElementById("player");
+let scoreText = document.getElementById("score");
+let score = 0;
 
-    <!-- Breathing Guide -->
-    <div class="breath-circle" id="breathCircle"></div>
+let playerX = window.innerWidth / 2;
+let playerY = window.innerHeight * 0.7;
 
-    <!-- Gratitude Wall -->
-    <div class="gratitude-wall">
-      <h2>Global Gratitude</h2>
-      <div id="gratitude-feed"></div>
-    </div>
+// Touch movement
+document.addEventListener("touchmove", function(e) {
+  let touch = e.touches[0];
+  playerX = touch.clientX;
+  playerY = touch.clientY;
 
-    <!-- Streak Tracker -->
-    <div class="streak-box">
-      🔥 Streak: <span id="streakCount">0</span> days
-    </div>
+  player.style.left = playerX + "px";
+  player.style.top = playerY + "px";
+});
 
-    <!-- Reflection Prompt -->
-    <div class="prompt-box">
-      🌟 Reflection: <span id="promptText"></span>
-    </div>
-  </div>
+// Also works with mouse (for laptop testing)
+document.addEventListener("mousemove", function(e) {
+  playerX = e.clientX;
+  playerY = e.clientY;
 
-  <div class="footer">
-    Global Sync Active (UTC)
-  </div>
+  player.style.left = playerX + "px";
+  player.style.top = playerY + "px";
+});
 
-  <script>
-    // Timer + Breathing Guide
-    function updateGlobalTimer() {
-      const now = new Date();
-      const utcMinutes = now.getUTCMinutes();
-      const utcSeconds = now.getUTCSeconds();
-      
-      let m = 14 - (utcMinutes % 15);
-      let s = 59 - utcSeconds;
+// Create coins
+function createCoin() {
+  let coin = document.createElement("div");
+  coin.classList.add("coin");
 
-      const displayM = m < 10 ? "0" + m : m;
-      const displayS = s < 10 ? "0" + s : s;
+  let x = Math.random() * (window.innerWidth - 40);
+  let y = Math.random() * (window.innerHeight - 40);
 
-      document.getElementById('timer').innerText = `${displayM}:${displayS}`;
+  coin.style.left = x + "px";
+  coin.style.top = y + "px";
 
-      const status = document.getElementById('status');
-      const breathCircle = document.getElementById('breathCircle');
+  document.body.appendChild(coin);
 
-      if (m === 0 && s < 10) {
-        status.innerText = "Prepare to breathe...";
-        status.style.color = "#00f2fe";
-        breathCircle.style.display = "block";
-      } else {
-        status.innerText = "The world will pause together.";
-        status.style.color = "#94a3b8";
-        breathCircle.style.display = "none";
-      }
+  // Collision check
+  let interval = setInterval(function() {
+    let coinRect = coin.getBoundingClientRect();
+    let playerRect = player.getBoundingClientRect();
+
+    if (
+      coinRect.left < playerRect.right &&
+      coinRect.right > playerRect.left &&
+      coinRect.top < playerRect.bottom &&
+      coinRect.bottom > playerRect.top
+    ) {
+      score++;
+      scoreText.innerText = "Score: " + score;
+      coin.remove();
+      clearInterval(interval);
+      createCoin();
     }
-    setInterval(updateGlobalTimer, 1000);
-    updateGlobalTimer();
+  }, 20);
+}
 
-    // Gratitude Wall
-    const messages = [
-      "Grateful for family 💙",
-      "Thankful for fresh air 🌱",
-      "Appreciating small joys ☀️",
-      "Cherishing kindness from strangers 🤝",
-      "Grateful for this shared moment 🌍"
-    ];
-    function rotateMessages() {
-      const feed = document.getElementById('gratitude-feed');
-      feed.style.opacity = 0;
-      setTimeout(() => {
-        feed.innerText = messages[Math.floor(Math.random() * messages.length)];
-        feed.style.opacity = 1;
-      }, 1000);
-    }
-    setInterval(rotateMessages, 5000);
-    rotateMessages();
+createCoin();
+</script>
 
-    // Streak Tracker
-    function updateStreak() {
-      const today = new Date().toDateString();
-      let lastPause = localStorage.getItem("lastPause");
-      let streak = parseInt(localStorage.getItem("streak") || "0");
-
-      if (lastPause !== today) {
-        streak++;
-        localStorage.setItem("streak", streak);
-        localStorage.setItem("lastPause", today);
-      }
-      document.getElementById("streakCount").innerText = streak;
-    }
-    updateStreak();
-
-    // Reflection Prompt
-    const prompts = [
-      "What made you smile today?",
-      "Who are you grateful for?",
-      "What small joy did you notice?",
-      "What do you want to let go of?"
-    ];
-    document.getElementById("promptText").innerText =
-      prompts[Math.floor(Math.random() * prompts.length)];
-
-    // Starry Background
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement("div");
-      star.className = "star";
-      star.style.top = Math.random() * 100 + "%";
-      star.style.left = Math.random() * 100 + "%";
-      document.getElementById("starryBg").appendChild(star);
-    }
-  </script>
 </body>
 </html>
